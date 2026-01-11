@@ -31,8 +31,9 @@ RUN <<EOT
     rm -rf /var/lib/apt/lists/*
 EOT
 
-COPY --from=mikefarah/yq /usr/bin/yq /usr/bin/yq
+COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/yq
 COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/deno
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 RUN \
     groupadd \
@@ -51,12 +52,15 @@ RUN chown --recursive "${APP_USER}:${APP_USER}" /workspace
 
 USER "${APP_USER}"
 
-RUN curl \
+RUN <<EOT
+    set -o errexit -o pipefail && \
+    curl \
         --fail \
         --silent \
         --show-error \
-        --follow \
+        --location \
         https://cursor.com/install | bash
+EOT
 
 ENV HOME="/home/${APP_USER}"
 ENV PATH="${HOME}/.local/bin:${PATH}"
