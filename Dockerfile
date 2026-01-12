@@ -12,6 +12,7 @@ RUN <<EOT
     apt-get update && \
     apt-get install --yes --no-install-recommends \
         bc \
+        bzip2 \
         ca-certificates \
         curl \
         dnsutils \
@@ -26,14 +27,18 @@ RUN <<EOT
         ripgrep \
         rsync \
         socat \
-        unzip && \
+        tree \
+        unzip \
+        vim \
+        zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 EOT
 
-COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/yq
-COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/deno
+COPY --from=mikefarah/yq /usr/bin/yq /usr/local/bin/
+COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/
 
 RUN \
     groupadd \
@@ -64,5 +69,6 @@ EOT
 
 ENV HOME="/home/${APP_USER}"
 ENV PATH="${HOME}/.local/bin:${PATH}"
+ENV EDITOR="vim"
 
 ENTRYPOINT ["agent"]
