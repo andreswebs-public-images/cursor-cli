@@ -3,10 +3,6 @@ FROM docker.io/debian:trixie
 
 ARG DEBIAN_FRONTEND="noninteractive"
 
-ARG APP_UID="2000"
-ARG APP_GID="2000"
-ARG APP_USER="cursor"
-
 RUN <<EOT
     set -o errexit && \
     apt-get update && \
@@ -40,6 +36,10 @@ COPY --from=denoland/deno:bin-2.6.4 /deno /usr/local/bin/
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 COPY --from=oven/bun:1 /usr/local/bin/bun /usr/local/bin/
 
+ARG APP_UID="2000"
+ARG APP_GID="2000"
+ARG APP_USER="cursor"
+
 RUN \
     groupadd \
       --gid "${APP_GID}" "${APP_USER}" && \
@@ -57,6 +57,13 @@ RUN chown --recursive "${APP_USER}:${APP_USER}" /workspace
 
 USER "${APP_USER}"
 
+ENV HOME="/home/${APP_USER}"
+ENV PATH="${HOME}/.local/bin:${PATH}"
+ENV EDITOR="vim"
+ENV DO_NOT_TRACK="true"
+
+RUN echo 'export PS1="\e[34m\u@\h\e[35m \w\e[0m\n$ "' >> "${HOME}/.bashrc"
+
 RUN <<EOT
     set -o errexit -o pipefail && \
     curl \
@@ -66,9 +73,5 @@ RUN <<EOT
         --location \
         https://cursor.com/install | bash
 EOT
-
-ENV HOME="/home/${APP_USER}"
-ENV PATH="${HOME}/.local/bin:${PATH}"
-ENV EDITOR="vim"
 
 ENTRYPOINT ["agent"]
