@@ -67,6 +67,9 @@ RUN \
     echo "${APP_USER} ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/${APP_USER}" && \
     chmod 0440 "/etc/sudoers.d/${APP_USER}"
 
+RUN mkdir /cursor
+RUN chown --recursive "${APP_USER}:${APP_USER}" /cursor
+
 WORKDIR /workspace
 RUN chown --recursive "${APP_USER}:${APP_USER}" /workspace
 
@@ -76,6 +79,7 @@ ENV HOME="/home/${APP_USER}"
 ENV PATH="${HOME}/.local/bin:${HOME}/.bun/bin:${PATH}"
 ENV EDITOR="vim"
 ENV DO_NOT_TRACK="true"
+ENV CURSOR_CONFIG_DIR="/cursor"
 
 RUN mkdir --parents "${HOME}/.local/share"
 RUN mkdir --parents "${HOME}/.local/bin"
