@@ -2,6 +2,8 @@
 name: docker.io
 
 on:
+  workflow_dispatch: {}
+
   push:
     branches:
       - main
@@ -16,8 +18,6 @@ jobs:
     env:
       CONTAINER_REGISTRY: docker.io
       CONTAINER_REPOSITORY: andreswebs/cursor-cli
-      IMAGE_TAG: ${{ github.sha }}
-      IMAGE_DEFAULT_TAG: latest
 
     steps:
       - name: Checkout
